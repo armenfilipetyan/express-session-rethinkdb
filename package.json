@@ -1,0 +1,30 @@
+{
+  "name": "express-session-rethinkdb",
+  "version": "0.1.0",
+  "description": "RethinkDB session store for Express 4.x",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/armenfilipetyan/express-session-rethinkdb.git"
+  },
+  "keywords": [
+    "expressjs",
+    "session",
+    "store",
+    "rethinkdb",
+    "rethink",
+    "db",
+    "connect"
+  ],
+  "author": "armenfilipetyan",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-contrib-watch": "~0.4.0"
+  },
+  "dependencies": {
+    "rethinkdbdash": "^1.15.2"
+  }
+}
