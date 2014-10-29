@@ -20,21 +20,22 @@ var session = require('express-session');
 var RDBStore = require('express-session-rethinkdb')(session);
 
 var rDBStore = new RDBStore({
-  maxAge: 60000,
   clientOptions: {
     db: 'test'
     host: 'localhost',
     port: '28015'
   }
-  table: 'session'
+  table: 'session',
+  sessionTimeout: 86400000,
+  flushInterval: 60000
 });
 
 var app = express();
 app.use( require('cookie-parser')() );
 app.use( session({
-    key: "app.sid",
+    key: "sid",
     secret: "my5uperSEC537(key)!",
-    cookie: { maxAge: 60000 },
+    cookie: { maxAge: 860000 },
     store: rDBStore 
   })
 );
@@ -44,27 +45,29 @@ app.use( ... );
 
 ##Constructor options
 
-###maxAge
-Unlike Redis, RethinkDB does not provide a ```SETEX``` function. So we have to flush expired sessions periodically. This defines the amount of time between two flushes.
-*Defaults to 60 seconds*
-
-###clientOptions
-We need these to connect to our DB. 
-*See [RethinkDB's doc](http://rethinkdb.com/api/#js:accessing_rql-connect).*
+###connectOptions
+Options for connecting to the database server. 
+*See [RethinkDB's doc](http://www.rethinkdb.com/api/javascript/#connect)*
 
 ###table
 Name of the table in which session data will be stored.
-*Defaults to 'session'*
+`Default: 'session'`
 
-###browserSessionsMaxAge
-If you do not set ```cookie.maxAge``` in ```session``` middleware, sessions will last until the user closes his/her browser. However we cannot keep the session data infinitely (for size and security reasons). In this case, this setting defines the maximum length of a session, even if the user doesn't close his/her browser.
-*Defaults to 1 day*
+###sessionTimeout
+If you do not set ```cookie.maxAge``` in ```session``` middleware, sessions will last until the user closes their browser. 
+However we cannot keep the session data infinitely (for size and security reasons). 
+In this case, this setting defines the maximum length of a session, even if the user does not close their browser. 
+`Default: 86400000` *1 day*
+
+###flushInterval
+RethinkDB does not yet provide an expiration function ( like ```SETEX``` for Redis ), so we have to remove the old expired sessions from the database intermittently. This is the time interval in milliseconds between flushing of expired sessions.
+`Default: 60000` *60 seconds*
 
 ##License
 
 The MIT License (MIT)
 
-Copyright (c) <year> <copyright holders>
+Copyright (c) 2014 Armen Filipetyan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
