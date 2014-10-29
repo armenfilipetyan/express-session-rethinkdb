@@ -4,7 +4,7 @@ Express Session RethinkDB
 ###RethinkDB session store for Express 4.x 
 
 *Inspired by TJ Holowaychuk's [Connect Redis](https://github.com/visionmedia/connect-redis)*
-*Inspired by guillaumervls [Connect RethinkDB](https://github.com/guillaumervls/connect-rethinkdb)
+*Inspired by guillaumervls [Connect RethinkDB](https://github.com/guillaumervls/connect-rethinkdb)*
 
 ##Installation
 
