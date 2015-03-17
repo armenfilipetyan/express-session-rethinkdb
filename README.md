@@ -25,7 +25,7 @@ var rDBStore = new RDBStore({
     db: 'test'
     host: 'localhost',
     port: '28015'
-  }
+  },
   table: 'session',
   sessionTimeout: 86400000,
   flushInterval: 60000

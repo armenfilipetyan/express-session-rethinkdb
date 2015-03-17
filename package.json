@@ -1,6 +1,6 @@
 {
   "name": "express-session-rethinkdb",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "RethinkDB session store for Express 4.x",
   "main": "index.js",
   "repository": {
@@ -20,11 +20,13 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.4.3",
-    "grunt-contrib-watch": "~0.4.0"
+    "gulp": "^3.8.8",
+    "gulp-uglify": "^1.0.1",
+    "gulp-notify": "*",
+    "gulp-jshint": "*"
   },
   "dependencies": {
-    "rethinkdbdash": "^1.15.2"
+    "express-session": "^1.8.2",
+    "rethinkdbdash": "^1.16.6"
   }
 }
