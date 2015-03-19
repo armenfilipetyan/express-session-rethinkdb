@@ -21,8 +21,8 @@ var session = require('express-session');
 var RDBStore = require('express-session-rethinkdb')(session);
 
 var rDBStore = new RDBStore({
-  clientOptions: {
-    db: 'test'
+  connectOptions: {
+    db: 'test',
     host: 'localhost',
     port: '28015'
   },
