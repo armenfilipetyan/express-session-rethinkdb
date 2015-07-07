@@ -1,6 +1,6 @@
 {
   "name": "express-session-rethinkdb",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "RethinkDB session store for Express 4.x",
   "main": "index.js",
   "repository": {
