@@ -22,9 +22,18 @@ var RDBStore = require('express-session-rethinkdb')(session);
 
 var rDBStore = new RDBStore({
   connectOptions: {
+    servers: [
+      { host: '192.168.0.100', port: 28015 },
+      { host: '192.168.0.101', port: 28015 },
+      { host: '192.168.0.102', port: 28015 }
+    ],
     db: 'test',
-    host: 'localhost',
-    port: '28015'
+    discovery: false,
+    pool: false,
+    buffer: 50,
+    max: 1000,
+    timeout: 20,
+    timeoutError: 1000
   },
   table: 'session',
   sessionTimeout: 86400000,
@@ -49,6 +58,7 @@ app.use( ... );
 ###connectOptions
 Options for connecting to the database server. 
 *See [RethinkDB's doc](http://www.rethinkdb.com/api/javascript/#connect)*
+*Also see [rethinkdbdash](https://github.com/neumino/rethinkdbdash)*
 
 ###table
 Name of the table in which session data will be stored.
@@ -68,7 +78,7 @@ RethinkDB does not yet provide an expiration function ( like ```SETEX``` for Red
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Armen Filipetyan
+Copyright (c) 2014-2015 Armen Filipetyan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
