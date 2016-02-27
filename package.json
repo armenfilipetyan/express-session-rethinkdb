@@ -2,7 +2,6 @@
   "name": "express-session-rethinkdb",
   "version": "0.2.0",
   "description": "RethinkDB session store for Express 4.x",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/armenfilipetyan/express-session-rethinkdb.git"
@@ -18,15 +17,8 @@
   ],
   "author": "armenfilipetyan",
   "license": "MIT",
-  "readmeFilename": "README.md",
-  "devDependencies": {
-    "gulp": "*",
-    "gulp-uglify": "*",
-    "gulp-notify": "*",
-    "gulp-jshint": "*"
-  },
   "dependencies": {
-    "express-session": "*",
-    "rethinkdbdash": "*"
+    "express-session": "^1.13.0",
+    "rethinkdb": "^2.2.2"
   }
 }
