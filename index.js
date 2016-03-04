@@ -21,7 +21,7 @@ module.exports = function (session) {
     this.table = options.table || 'session';
     setInterval( function() {
       try {
-        r.table(this.table).filter( r.row('expires').lt(r.now().toEpochTime().mul(1000)) ).delete().run(conn);
+        r.table(this.table).filter( r.row('expires').lt(r.now().toEpochTime().mul(1000)) ).delete().run();
       }
       catch (error) {
         console.error( error );
@@ -33,7 +33,7 @@ module.exports = function (session) {
 
   // Get Session
   RethinkStore.prototype.get = function (sid, fn) {
-    r.table(this.table).get(sid).run(this.conn).then(function (data) {
+    r.table(this.table).get(sid).run().then(function (data) {
       fn(null, data ? JSON.parse(data.session) : null);
     }).error(function (err) {
       fn(err);
@@ -48,7 +48,7 @@ module.exports = function (session) {
       session: JSON.stringify(sess)
     };
 
-    r.table(this.table).insert(sessionToStore, { conflict: 'replace' }).run(this.conn).then(function (data) {
+    r.table(this.table).insert(sessionToStore, { conflict: 'replace' }).run().then(function (data) {
       if (typeof fn === 'function') {
         fn();
       }
@@ -59,7 +59,7 @@ module.exports = function (session) {
 
   // Destroy Session
   RethinkStore.prototype.destroy = function (sid, fn) {
-    r.table(this.table).get(sid).delete().run(this.conn).then(function (data) {
+    r.table(this.table).get(sid).delete().run().then(function (data) {
       if (typeof fn === 'function'){
         fn();
       }
