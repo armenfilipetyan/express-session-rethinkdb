@@ -3,8 +3,6 @@
  *  MIT Licensed
  */
 
-'use strict';
-
 var rethinkdb = require('rethinkdbdash');
 
 module.exports = function (session) {
