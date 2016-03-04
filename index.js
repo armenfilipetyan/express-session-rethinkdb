@@ -1,63 +1,34 @@
+/*!
+ *  Express Session RethinkDB
+ *  MIT Licensed
+ */
+
 'use strict';
+
+var rethinkdb = require('rethinkdbdash');
 
 module.exports = function (session) {
   var Store = session.Store;
 
   function RethinkStore(options) {
-    var self = this;
-
     options = options || {};
-    options.table = options.table || 'sessions';
-    this.instance = options.instance || require('rethinkdb');
-    this.options = options;
-
-    if (!options.connection) throw 'Invalid `connection` option specified. Please provide a promise or a function that has a callback.';
-    if (!options.database) throw 'Invalid `database` option specified. This is required for creating the sessions table in the correct location';
-    if (!options.table) throw 'Invalid `table` option specified. Please specify a string, or leave blank for default \'sessions\' value.';
+    options.connectOptions = options.connectOptions || {};
 
     Store.call(this, options);
 
-    if (options.connection.then) {
-      options.connection.then(function (conn) {
-        self.emit('connect', conn);
-      }).catch(function (error) {
-        self.emit('disconnect', error);
-      })
-    } else if (typeof options.connection === 'function') {
-      options.connection(function (error, conn) {
-        if (error) {
-          return self.emit('disconnect', error);
-        }
+    r = new rethinkdb(options.connectOptions);
 
-        self.emit('connect', conn);
-      });
-    }
-
-    this.on('connect', function (conn) {
-      var r = self.instance;
-      var db = self.options.database;
-      var table = self.options.table;
-
-      conn.use(db);
-
-      self.conn = conn;
-
-      r.tableCreate(table).run(conn, function (err, res) {
-        if (err) {
-          console.log('Table \'' + table + '\' already exists, skipping creation -- ', err);
-        }
-
-        setInterval(function() {
-          var now = new Date().getTime();
-
-          try {
-            r.db(db).table(table).filter(r.row('expires').lt(now)).delete().run(conn);
-          } catch (error) {
-            console.error(error);
-          }
-        }, options.flushInterval || 60000);
-      });
-    });
+    this.emit('connect');
+    this.sessionTimeout = options.sessionTimeout || 86400000; // 1 day
+    this.table = options.table || 'session';
+    setInterval( function() {
+      try {
+        r.table(this.table).filter( r.row('expires').lt(r.now().toEpochTime().mul(1000)) ).delete().run(conn);
+      }
+      catch (error) {
+        console.error( error );
+      }
+    }.bind( this ), options.flushInterval || 60000 );
   }
 
   RethinkStore.prototype = new Store();

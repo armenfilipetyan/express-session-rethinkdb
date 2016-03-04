@@ -1,6 +1,6 @@
 {
   "name": "express-session-rethinkdb",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "RethinkDB session store for Express 4.x",
   "repository": {
     "type": "git",
@@ -19,6 +19,6 @@
   "license": "MIT",
   "dependencies": {
     "express-session": "^1.13.0",
-    "rethinkdb": "^2.2.2"
+    "rethinkdbdash": "^2.2.18"
   }
 }
