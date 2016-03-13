@@ -4,6 +4,7 @@
  */
 
 var rethinkdb = require('rethinkdbdash');
+var cache = require('memory-cache');
 
 module.exports = function (session) {
   var Store = session.Store;
@@ -19,6 +20,7 @@ module.exports = function (session) {
     this.emit('connect');
     this.sessionTimeout = options.sessionTimeout || 86400000; // 1 day
     this.table = options.table || 'session';
+    this.debug = options.debug || false;
     setInterval( function() {
       try {
         r.table(this.table).filter( r.row('expires').lt(r.now().toEpochTime().mul(1000)) ).delete().run();
@@ -33,11 +35,17 @@ module.exports = function (session) {
 
   // Get Session
   RethinkStore.prototype.get = function (sid, fn) {
-    r.table(this.table).get(sid).run().then(function (data) {
-      fn(null, data ? JSON.parse(data.session) : null);
-    }).error(function (err) {
-      fn(err);
-    });
+    var sdata = cache.get('sess-'+sid);
+    if (sdata) {
+      if( this.debug ){ console.log( 'SESSION: (get)', JSON.parse(sdata.session) ) };
+      fn(null, JSON.parse(sdata.session));
+    } else {
+        r.table(this.table).get(sid).run().then(function (data) {
+          fn(null, data ? JSON.parse(data.session) : null);
+        }).error(function (err) {
+          fn(err);
+        });
+    }
   };
 
   // Set Session
@@ -48,7 +56,12 @@ module.exports = function (session) {
       session: JSON.stringify(sess)
     };
 
-    r.table(this.table).insert(sessionToStore, { conflict: 'replace' }).run().then(function (data) {
+    r.table(this.table).insert(sessionToStore, { conflict: 'replace', returnChanges: true }).run().then(function (data) {
+      var sdata = data.changes[0].new_val || null;
+      if (sdata){
+          if (this.debug){ console.log( 'SESSION: (set)', sdata.id ); }
+          cache.put( 'sess-'+ sdata.id, sdata, 30000 );
+      }
       if (typeof fn === 'function') {
         fn();
       }
@@ -59,6 +72,8 @@ module.exports = function (session) {
 
   // Destroy Session
   RethinkStore.prototype.destroy = function (sid, fn) {
+    if (this.debug){ console.log( 'SESSION: (destroy)', sid ); }
+    cache.del('sess-'+sid);
     r.table(this.table).get(sid).delete().run().then(function (data) {
       if (typeof fn === 'function'){
         fn();

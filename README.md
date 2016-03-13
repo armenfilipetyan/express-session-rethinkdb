@@ -37,7 +37,8 @@ var rdbStore = new RDBStore({
   },
   table: 'session',
   sessionTimeout: 86400000,
-  flushInterval: 60000
+  flushInterval: 60000,
+  debug: false
 });
 
 app.use(cookie());
@@ -71,6 +72,9 @@ In this case, this setting defines the maximum length of a session, even if the 
 ###flushInterval
 RethinkDB does not yet provide an expiration function ( like ```SETEX``` for Redis ), so we have to remove the old expired sessions from the database intermittently. This is the time interval in milliseconds between flushing of expired sessions.
 `Default: 60000` *60 seconds*
+
+###debug
+If debug is enabled, this middleware will start using console.log() to print debug type messages for session get, set, and destroy. These are currently mostly geared toward the memory caching. It takes a ```true``` or ```false``` value. `Default: false`
 
 ## Attribution
 
