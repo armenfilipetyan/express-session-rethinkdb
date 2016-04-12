@@ -23,10 +23,13 @@ module.exports = function (session) {
     this.debug = options.debug || false;
     setInterval( function() {
       try {
-        r.table(this.table).filter( r.row('expires').lt(r.now().toEpochTime().mul(1000)) ).delete().run();
+        r.table(this.table).filter( r.row('expires').lt(r.now().toEpochTime().mul(1000)) ).delete().run(function(err, user) {
+          return null;
+        });
       }
       catch (error) {
         console.error( error );
+        return null;
       }
     }.bind( this ), options.flushInterval || 60000 );
   }
@@ -38,12 +41,12 @@ module.exports = function (session) {
     var sdata = cache.get('sess-'+sid);
     if (sdata) {
       if( this.debug ){ console.log( 'SESSION: (get)', JSON.parse(sdata.session) ) };
-      fn(null, JSON.parse(sdata.session));
+      return fn(null, JSON.parse(sdata.session));
     } else {
         r.table(this.table).get(sid).run().then(function (data) {
-          fn(null, data ? JSON.parse(data.session) : null);
+          return fn(null, data ? JSON.parse(data.session) : null);
         }).error(function (err) {
-          fn(err);
+          return fn(err);
         });
     }
   };
@@ -57,16 +60,21 @@ module.exports = function (session) {
     };
 
     r.table(this.table).insert(sessionToStore, { conflict: 'replace', returnChanges: true }).run().then(function (data) {
-      var sdata = data.changes[0].new_val || null;
+      var sdata = null;
+      if(data.changes[0] != null)
+        sdata = data.changes[0].new_val || null;
+
       if (sdata){
           if (this.debug){ console.log( 'SESSION: (set)', sdata.id ); }
           cache.put( 'sess-'+ sdata.id, sdata, 30000 );
       }
       if (typeof fn === 'function') {
-        fn();
+        return fn();
       }
+      else
+        return null
     }).error(function (err) {
-      fn(err);
+      return fn(err);
     });
   };
 
@@ -76,10 +84,11 @@ module.exports = function (session) {
     cache.del('sess-'+sid);
     r.table(this.table).get(sid).delete().run().then(function (data) {
       if (typeof fn === 'function'){
-        fn();
+        return fn();
       }
+      else return null;
     }).error(function (err) {
-      fn(err);
+      return fn(err);
     });
   };
 
