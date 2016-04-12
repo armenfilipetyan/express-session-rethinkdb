@@ -57,7 +57,9 @@ module.exports = function (session) {
     };
 
     r.table(this.table).insert(sessionToStore, { conflict: 'replace', returnChanges: true }).run().then(function (data) {
-      var sdata = data.changes[0].new_val || null;
+      var sdata = null;
+      if(data.changes[0] != null)
+        sdata = data.changes[0].new_val || null;
       if (sdata){
           if (this.debug){ console.log( 'SESSION: (set)', sdata.id ); }
           cache.put( 'sess-'+ sdata.id, sdata, 30000 );
