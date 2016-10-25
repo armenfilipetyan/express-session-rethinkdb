@@ -15,7 +15,7 @@ module.exports = function (session) {
 
     Store.call(this, options);
 
-    r = new rethinkdb(options.connectOptions);
+    r = options.connection || new rethinkdb(options.connectOptions);
 
     this.emit('connect');
     this.sessionTimeout = options.sessionTimeout || 86400000; // 1 day
