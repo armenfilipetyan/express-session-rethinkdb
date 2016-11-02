@@ -51,11 +51,73 @@ app.use(session({
 
 // the rest of your server code..
 ```
+###With rethinkdbdash connection 
+
+```javascript
+var express = require('express');
+var cookie = require('cookie-parser');
+var session = require('express-session');
+var RDBStore = require('express-session-rethinkdb')(session);
+var rethinkdb = require('rethinkdbdash');
+
+var r = new rethinkdb({db: "test"}) //normal rethinkdbdash connection can be used across your project
+var app = express();
+var rdbStore = new RDBStore({
+  connection: r,
+  table: 'session',
+  sessionTimeout: 86400000,
+  flushInterval: 60000,
+  debug: false
+});
+
+app.use(cookie());
+app.use(session({
+  key: 'sid',
+  secret: 'my5uperSEC537(key)!',
+  cookie: { maxAge: 860000 },
+  store: rdbStore
+}));
+
+// the rest of your server code..
+```
+###With Thinky 
+
+```javascript
+var express = require('express');
+var cookie = require('cookie-parser');
+var session = require('express-session');
+var RDBStore = require('express-session-rethinkdb')(session);
+var thinky = require('thinky')({db: "test"}); 
+
+var app = express();
+var rdbStore = new RDBStore({
+  connection: thinky.r,
+  table: 'session',
+  sessionTimeout: 86400000,
+  flushInterval: 60000,
+  debug: false
+});
+
+app.use(cookie());
+app.use(session({
+  key: 'sid',
+  secret: 'my5uperSEC537(key)!',
+  cookie: { maxAge: 860000 },
+  store: rdbStore
+}));
+
+// the rest of your server code..
+```
 
 ##Constructor options
 
+###connection
+rethinkdbdash connection instance.
+*See [RethinkDB's doc](http://www.rethinkdb.com/api/javascript/#connect)*
+*Also see [rethinkdbdash](https://github.com/neumino/rethinkdbdash)*
+
 ###connectOptions
-Options for connecting to the database server.
+Options for connecting to the database server. (if connection is set connectOptions will be ignored)
 *See [RethinkDB's doc](http://www.rethinkdb.com/api/javascript/#connect)*
 *Also see [rethinkdbdash](https://github.com/neumino/rethinkdbdash)*
 
